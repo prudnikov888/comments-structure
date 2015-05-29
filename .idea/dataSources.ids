@@ -13203,24 +13203,33 @@
       <column name="F_ID" sqlType="NUMBER" precision="19" scale="0" nullable="false" jdbcType="3"/>
       <column name="F_TEXT" sqlType="VARCHAR2" precision="255" scale="0" nullable="true" jdbcType="12"/>
       <column name="F_COMMENTED_OBJECT_ID" sqlType="NUMBER" precision="19" scale="0" nullable="true" jdbcType="3"/>
-      <primary-key name="SYS_C0011599" columns="F_ID"/>
+      <primary-key name="SYS_C0012259" columns="F_ID"/>
       <foreign-key name="FK_QVGIJV2T9OFOT3LP34MJEI6I7" columns="F_COMMENTED_OBJECT_ID" ref-table="T_ID_GENERATOR" ref-schema="TEST" ref-catalog="" ref-columns="F_ID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <exported-key name="FK_AJC4ANGJXVGSX1EMSGE2M2DOO" table="T_ID_GENERATOR_T_COMMENT" schema="TEST" catalog="" columns="COMMENTVOLIST_F_ID"/>
     </table>
     <table name="T_GROUP" schema="TEST" catalog="" type="TABLE">
       <column name="F_ID" sqlType="NUMBER" precision="19" scale="0" nullable="false" jdbcType="3"/>
       <column name="F_GROUP_NAME" sqlType="VARCHAR2" precision="255" scale="0" nullable="true" jdbcType="12"/>
-      <primary-key name="SYS_C0011601" columns="F_ID"/>
+      <primary-key name="SYS_C0012261" columns="F_ID"/>
     </table>
     <table name="T_ID_GENERATOR" schema="TEST" catalog="" type="TABLE">
       <column name="F_ID" sqlType="NUMBER" precision="19" scale="0" nullable="false" jdbcType="3"/>
-      <primary-key name="SYS_C0011603" columns="F_ID"/>
+      <primary-key name="SYS_C0012263" columns="F_ID"/>
       <exported-key name="FK_QVGIJV2T9OFOT3LP34MJEI6I7" table="T_COMMENT" schema="TEST" catalog="" columns="F_COMMENTED_OBJECT_ID"/>
+      <exported-key name="FK_Q719W9X5YD1364YJ9SPQS4JAM" table="T_ID_GENERATOR_T_COMMENT" schema="TEST" catalog="" columns="T_ID_GENERATOR_F_ID"/>
     </table>
     <table name="T_ID_GENERATOR_SEQ" schema="TEST" catalog="" type="SEQUENCE"/>
+    <table name="T_ID_GENERATOR_T_COMMENT" schema="TEST" catalog="" type="TABLE">
+      <column name="T_ID_GENERATOR_F_ID" sqlType="NUMBER" precision="19" scale="0" nullable="false" jdbcType="3"/>
+      <column name="COMMENTVOLIST_F_ID" sqlType="NUMBER" precision="19" scale="0" nullable="false" jdbcType="3"/>
+      <foreign-key name="FK_AJC4ANGJXVGSX1EMSGE2M2DOO" columns="COMMENTVOLIST_F_ID" ref-table="T_COMMENT" ref-schema="TEST" ref-catalog="" ref-columns="F_ID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <foreign-key name="FK_Q719W9X5YD1364YJ9SPQS4JAM" columns="T_ID_GENERATOR_F_ID" ref-table="T_ID_GENERATOR" ref-schema="TEST" ref-catalog="" ref-columns="F_ID" update-rule="0" delete-rule="1" deferrability="2"/>
+      <index name="UK_AJC4ANGJXVGSX1EMSGE2M2DOO" unique="true" columns="COMMENTVOLIST_F_ID"/>
+    </table>
     <table name="T_LESSON" schema="TEST" catalog="" type="TABLE">
       <column name="F_ID" sqlType="NUMBER" precision="19" scale="0" nullable="false" jdbcType="3"/>
       <column name="F_LESSON_NAME" sqlType="VARCHAR2" precision="255" scale="0" nullable="true" jdbcType="12"/>
-      <primary-key name="SYS_C0011605" columns="F_ID"/>
+      <primary-key name="SYS_C0012267" columns="F_ID"/>
     </table>
     <procedure name="BLASTN_ALIGN" schema="SYS" catalog="" type="2" remarks="U3RhbmRhbG9uZSBwcm9jZWR1cmUgb3IgZnVuY3Rpb24=">
       <prototype>

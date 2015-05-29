@@ -71,8 +71,6 @@ public class LessonVO implements Serializable {
 
     @Override
     public String toString() {
-	return "GroupVO{" + "id=" + id + ", groupName=" + lessonName + "}";
+	return "LessonVO{" + "id=" + id + ", lessonName=" + lessonName + "}";
     }
-
-
 }

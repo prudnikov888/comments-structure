@@ -19,7 +19,7 @@ public class HibConfiguration extends AnnotationConfiguration {
 	    .setProperty("hibernate.connection.password", "test")
 	    .setProperty("hibernate.connection.autocommit", "true")
 	    .setProperty("hibernate.default_schema", "test")
-		.setProperty("hibernate.show_sql", "true")
+		.setProperty("hibernate.show_sql", "false")
 		.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 	}
 }

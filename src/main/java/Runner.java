@@ -1,3 +1,4 @@
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import pojos.CommentVO;
@@ -5,7 +6,9 @@ import pojos.IdGenerator;
 import pojos.GroupVO;
 import pojos.LessonVO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Runner {
@@ -16,81 +19,148 @@ public class Runner {
     public static void main(String[] args) {
         cfg = new HibConfiguration();
         sf = cfg.buildSessionFactory();
-        GroupVO temp1 = null;
-        CommentVO temp2 = null;
 
-        //Fulfilling database:
-        // group1, group2, lesson1, lesson;
-
+        //creating and saving new group
         GroupVO g1 = new GroupVO();
-        g1.setGroupName("Group 1");
-        IdGenerator i1 = new IdGenerator();
-        g1.setIdGenerator(i1);
+        g1.setGroupName("Group1");
+        g1.setIdGenerator(new IdGenerator());
+        session = sf.openSession();
+        session.save(g1);
+        session.flush();
+        session.close();
 
-        GroupVO g2 = new GroupVO();
-        g2.setGroupName("Group 2");
-        IdGenerator i2 = new IdGenerator();
-        g2.setIdGenerator(i2);
-
+        //creating and saving new lesson
         LessonVO les1 = new LessonVO();
-        les1.setLessonName("Lesson 1");
-        IdGenerator i3 = new IdGenerator();
-        les1.setIdGenerator(i3);
-
-        LessonVO les2 = new LessonVO();
-        les2.setLessonName("Lesson 2");
-        IdGenerator i4 = new IdGenerator();
-        les2.setIdGenerator(i4);
-
-
-
-        //Fulfilling database with comments and answers
-
-        CommentVO c1 = new CommentVO();
-        c1.setText("Comment1 to Group1");
-        IdGenerator i5 = new IdGenerator();
-        c1.setIdGenerator(i5);
-        List<CommentVO> commentVOList = new ArrayList<CommentVO>();
-        i5.setCommentVOList(commentVOList);
-        c1.setCommentedObjectId(i1);
-
-        CommentVO c2 = new CommentVO();
-        c2.setText("Comment1 to Lesson1");
-        IdGenerator i6 = new IdGenerator();
-        c2.setIdGenerator(i6);
-        c2.setCommentedObjectId(i3);
-
-        CommentVO c1a1 = new CommentVO();
-        c1a1.setText("Answer1 to Comment1");
-        IdGenerator i7 = new IdGenerator();
-        c1a1.setIdGenerator(i7);
-        c1a1.setCommentedObjectId(i5);
-
-        CommentVO c1a2 = new CommentVO();
-        c1a2.setText("Answer2 to Comment1");
-        IdGenerator i8 = new IdGenerator();
-        c1a2.setIdGenerator(i8);
-        c1a2.setCommentedObjectId(i5);
-
+        les1.setLessonName("Lesson1");
+        les1.setIdGenerator(new IdGenerator());
         session = sf.openSession();
-        session.save(g1);
-        session.save(g2);
         session.save(les1);
-        session.save(les2);
         session.flush();
         session.close();
 
-        /*
+        CommentModel m = new CommentModel();
+
+        //creating and saving comments to Group1
+        m.commentedObjectId = g1.getId();
+        m.text = "Comment1 to Group1";
+        addComment(m);
+        m.text = "Comment2 to Group1";
+        addComment(m);
+
+        //creating and saving comments to Lesson1
+        m.commentedObjectId = les1.getId();
+        m.text = "Comment1 to Lesson1";
+        addComment(m);
+        m.text = "Comment2 to Lesson1";
+        addComment(m);
+
+        //creating and saving answers to Comment1 to Group1
         session = sf.openSession();
-        session.save(g1);
-        session.save(g2);
-        session.save(les1);
-        session.save(c1a2);
-        session.delete(c2);
-        session.delete(les1);
+        IdGenerator gen = (IdGenerator) session.get(IdGenerator.class, g1.getId());
+        session.close();
+        m.commentedObjectId = gen.getCommentVOList().get(0).getId();
+        m.text = "Answer1 to Comment1 to Group1";
+        addComment(m);
+        m.text = "Answer2 to Comment1 to Group1";
+        addComment(m);
+        m.text = "Answer3 to Comment1 to Group1";
+        addComment(m);
+
+        //creating and saving answers to Comment1 to Lesson1
+        session = sf.openSession();
+        gen = (IdGenerator) session.get(IdGenerator.class, les1.getId());
+        session.close();
+        m.commentedObjectId = gen.getCommentVOList().get(0).getId();
+        m.text = "Answer1 to Comment1 to Lesson1";
+        addComment(m);
+        m.text = "Answer2 to Comment1 to Lesson1";
+        addComment(m);
+
+        //getting comments and answers for Group1
+        List<CommentModel> mList = getComments(g1.getId());
+        for (CommentModel c : mList) {
+            System.out.println(c.text);
+            List<CommentModel> aList = getComments(c.id);
+            for (CommentModel a : aList) {
+                System.out.println(a.text);
+            }
+        }
+        //getting comments and answers for Lesson1
+        System.out.println("");
+        mList = getComments(les1.getId());
+        for (CommentModel c : mList) {
+            System.out.println(c.text);
+            List<CommentModel> aList = getComments(c.id);
+            for (CommentModel a : aList) {
+                System.out.println(a.text);
+            }
+        }
+    }
+
+    //DTO object for transferring comments
+    static class CommentModel {
+        Long id;
+        String text;
+        Long commentedObjectId;
+
+        @Override
+        public String toString() {
+            return this.text;
+        }
+
+        public CommentModel() {
+        }
+        public CommentModel(CommentVO c) {
+            this.id = c.getIdGenerator().getId();
+            this.text = c.getText();
+            this.commentedObjectId = c.getCommentedObjectId().getId();
+        }
+    }
+
+    //transform CommentModel to CommentVO object
+    public static CommentVO modelToComment(CommentModel commentModel) {
+        CommentVO c = new CommentVO();
+        c.setText(commentModel.text);
+        c.setIdGenerator(new IdGenerator());
+        session = sf.openSession();
+        IdGenerator gen = (IdGenerator) session.get(IdGenerator.class, commentModel.commentedObjectId);
+        c.setCommentedObjectId(gen);
+        session.close();
+        return c;
+    }
+
+    //addComment method
+    public static void addComment(CommentModel commentModel) {
+        CommentVO c = modelToComment(commentModel);
+        IdGenerator commentedObjectId = c.getCommentedObjectId();
+        List<CommentVO> cList;
+        if (commentedObjectId.getCommentVOList() != null) {
+            cList = commentedObjectId.getCommentVOList();
+            cList.add(c);
+        } else {
+            cList = new ArrayList<CommentVO>();
+            cList.add(c);
+        }
+        commentedObjectId.setCommentVOList(cList);
+        c.setCommentedObjectId(commentedObjectId);
+        session = sf.openSession();
+        session.save(c);
         session.flush();
         session.close();
-        */
+    }
 
+    //get comments by id of the commented object
+    public static List<CommentModel> getComments(long commentedObjectId) {
+        List<CommentModel> mList = new ArrayList<CommentModel>();
+        String str = "select commentVOList from IdGenerator gen where gen.id = :commentedObjectId";
+        session = sf.openSession();
+        Query query = session.createQuery(str);
+        query.setParameter("commentedObjectId", commentedObjectId);
+        List<CommentVO> commentVOList = (List<CommentVO>) query.list();
+        session.close();
+        for (CommentVO c : commentVOList) {
+            mList.add(new CommentModel(c));
+        }
+        return mList;
     }
 }
